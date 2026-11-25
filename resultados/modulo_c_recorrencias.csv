@@ -1,0 +1,7 @@
+k,N_term,arquivo,V_obs,E_obs,B_obs,T_obs,E_recursivo,E_iteracao,E_caracteristica,B_recursivo,B_fechada,V_recursivo,V_fechada,confere_tudo
+0,16,tree3D_Nterm016.vtk,32,31,15,16,31,31,31,15,15,32,32,SIM
+1,32,tree3D_Nterm032.vtk,64,63,31,32,63,63,63,31,31,64,64,SIM
+2,64,tree3D_Nterm064.vtk,128,127,63,64,127,127,127,63,63,128,128,SIM
+3,128,tree3D_Nterm128.vtk,256,255,127,128,255,255,255,127,127,256,256,SIM
+4,256,tree3D_Nterm256.vtk,512,511,255,256,511,511,511,255,255,512,512,SIM
+5,512,tree3D_Nterm512.vtk,1024,1023,511,512,1023,1023,1023,511,511,1024,1024,SIM

@@ -1,0 +1,67 @@
+====================================================================
+MODULO B -- TEORIA DOS NUMEROS APLICADA A CONSULTA DOS SEGMENTOS
+====================================================================
+
+1. PARTE B0 -- NUCLEO OBRIGATORIO (tree3D_Nterm128.vtk, m = 7)
+Total de segmentos |E| = 255
+
+Classe    |C_j|       Comp. Medio         Raio Medio          
+--------------------------------------------------------------
+C_0       37          0.00563028          0.35982422          
+C_1       37          0.00511812          0.33768503          
+C_2       37          0.00480163          0.36795055          
+C_3       36          0.00638588          0.34726590          
+C_4       36          0.00504980          0.36465192          
+C_5       36          0.00523395          0.36811322          
+C_6       36          0.00562858          0.32808484          
+
+Validacao da particao (B0.2):
+  - Disjuncao par a par (C_j \cap C_k = vazio): SIM
+  - Soma das cardinalidades == |E|:              SIM
+  - Cobertura exata de {0, ..., |E|-1}:          SIM
+  - Particao valida:                             SIM
+
+Principio da Casa dos Pombos (B0.3):
+  - Limite inferior: ceil(255 / 7) = 37
+  - Maior classe observada: C_0 com 37 segmentos
+  - Verificacao (max >= limite inferior): SIM
+
+2. PARTE B1 -- TRILHA ELETIVA ESCOLHIDA: TRILHA 1 (ALGORITMO DE EUCLIDES E TCR)
+Sistema de congruencias simultaneas:
+  i === 1 (mod 4)
+  i === 2 (mod 5)
+
+Passos do Algoritmo de Euclides para mdc(4, 5):
+  4 = 0 * 5 + 4
+  5 = 1 * 4 + 1
+  4 = 4 * 1 + 0
+  => mdc(4, 5) = 1 (identidade de Bezout: 4*(-1) + 5*(1) = 1)
+
+Resolucao pelo Teorema Chines do Resto:
+  M  = 4 * 5 = 20
+  M1 = M / m1 = 5, inverso y1 = M1^{-1} mod 4 = 1
+  M2 = M / m2 = 4, inverso y2 = M2^{-1} mod 5 = 4
+  x0 = (1*5*1 + 2*4*4) mod 20 = 17
+  Congruencia equivalente: i === 17 (mod 20)
+
+Resultados em tree3D_Nterm128.vtk (|E|=255):
+  - Selecionados (direto pelas 2 congruencias): 12
+  - Selecionados (congruencia equivalente TCR): 12
+  - Conjuntos coincidem exatamente:             SIM
+  - Comprimento medio:                          0.00532665
+  - Raio medio:                                 0.35887719
+  - IDs selecionados (12): 17, 37, 57, 77, 97, 117, 137, 157, 177, 197, 217, 237
+
+Resultados em tree3D_Nterm512.vtk (|E|=1023):
+  - Selecionados (direto pelas 2 congruencias): 51
+  - Selecionados (congruencia equivalente TCR): 51
+  - Conjuntos coincidem exatamente:             SIM
+  - Comprimento medio:                          0.00332587
+  - Raio medio:                                 0.24230171
+  - IDs selecionados (51): 17, 37, 57, 77, 97, 117, 137, 157, 177, 197, 217, 237, 257, 277, 297, 317, 337, 357, 377, 397, 417, 437, 457, 477, 497, 517, 537, 557, 577, 597, 617, 637, 657, 677, 697, 717, 737, 757, 777, 797, 817, 837, 857, 877, 897, 917, 937, 957, 977, 997, 1017
+
+3. CRITERIO DE PERTINENCIA E LIMITACOES:
+Os identificadores i in {0, ..., |E|-1} sao rotulos computacionais derivados da ordem
+de armazenamento das entradas LINES no arquivo VTK. Portanto, classes modulares e
+consultas via TCR servem para particionamento, amostragem deterministica e verificacao
+reprodutivel de registros, nao implicando propriedades fisiologicas especiais.

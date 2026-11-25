@@ -1,0 +1,866 @@
+\documentclass[10pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazilian]{babel}
+\usepackage{lmodern}
+\usepackage[margin=1.75cm,top=1.75cm,bottom=1.65cm]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{colortbl}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{fancyhdr}
+\usepackage{listings}
+\usepackage{parskip}
+\usepackage[colorlinks=true,linkcolor=teal!70!black,urlcolor=blue!70!black,citecolor=teal!70!black]{hyperref}
+
+\definecolor{ufopteal}{RGB}{0,105,112}
+\definecolor{ufopbg}{RGB}{242,248,249}
+\definecolor{codebg}{RGB}{246,248,250}
+\definecolor{warnbg}{RGB}{255,248,236}
+\definecolor{warnborder}{RGB}{190,120,30}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\color{gray!70!black} BCC102 -- Matemática Discreta II \textbar{} CCO Explorer}
+\fancyhead[R]{\small\color{gray!70!black} UFOP -- 2026.2}
+\fancyfoot[C]{\small\color{gray!70!black} \thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\lstset{
+  basicstyle=\ttfamily\footnotesize,
+  backgroundcolor=\color{codebg},
+  frame=single,
+  rulecolor=\color{gray!40},
+  breaklines=true,
+  columns=fullflexible,
+  xleftmargin=4pt,
+  xrightmargin=4pt
+}
+
+\newsavebox{\ccobox}
+\newenvironment{destaque}[1]{%
+  \par\smallskip\noindent
+  \begin{lrbox}{\ccobox}%
+    \begin{minipage}{\dimexpr\linewidth-18pt\relax}%
+      \textbf{\color{ufopteal}#1}\par\smallskip
+}{%
+    \end{minipage}%
+  \end{lrbox}%
+  \begin{tikzpicture}
+    \node[fill=ufopbg, draw=ufopteal, line width=0.8pt, rounded corners=3pt, inner sep=8pt] {\usebox{\ccobox}};
+  \end{tikzpicture}\par\smallskip
+}
+
+\newenvironment{alerta}[1]{%
+  \par\smallskip\noindent
+  \begin{lrbox}{\ccobox}%
+    \begin{minipage}{\dimexpr\linewidth-18pt\relax}%
+      \textbf{\color{warnborder}#1}\par\smallskip
+}{%
+    \end{minipage}%
+  \end{lrbox}%
+  \begin{tikzpicture}
+    \node[fill=warnbg, draw=warnborder, line width=0.8pt, rounded corners=3pt, inner sep=8pt] {\usebox{\ccobox}};
+  \end{tikzpicture}\par\smallskip
+}
+
+\setcounter{tocdepth}{2}
+
+\captionsetup{font=small, labelfont=bf}
+
+\begin{document}
+
+% ============================================================================
+% CABECALHO / CAPA COMPACTA CIENTIFICO-TECNICA
+% ============================================================================
+\thispagestyle{empty}
+\begin{center}
+  {\large\textbf{UNIVERSIDADE FEDERAL DE OURO PRETO (UFOP)}}\\[2pt]
+  {\normalsize Instituto de Ciências Exatas e Biológicas (ICEB) -- Departamento de Computação (DECOM)}\\[10pt]
+  \textcolor{ufopteal}{\rule{\linewidth}{1.6pt}}\\[14pt]
+  {\LARGE\bfseries\color{ufopteal} CCO Explorer}\\[6pt]
+  {\Large\bfseries Aplicações de Matemática Discreta na Análise de Redes Vasculares}\\[10pt]
+  {\normalsize Relatório Científico-Técnico -- Trabalho Prático (TP)}\\
+  {\normalsize BCC102 -- Matemática Discreta II \textbar{} Período: 2026.2}\\[12pt]
+  \textcolor{ufopteal}{\rule{\linewidth}{0.8pt}}
+\end{center}
+
+\vspace{6pt}
+\begin{center}
+  \begin{tabular}{ll}
+    \textbf{Linguagem principal:} & C++20 (compilado com CMake no ambiente reprodutível \texttt{devenv}) \\
+    \textbf{Scripts auxiliares:} & Python 3 (biblioteca padrão: verificação cruzada, figuras TikZ e empacotamento) \\
+    \textbf{Trilha eletiva (B1):} & \textbf{Trilha 1 -- Algoritmo de Euclides e Teorema Chinês do Resto (TCR)} \\
+    \textbf{Integrantes do grupo:} & \textit{Preencher nomes completos e matrículas antes da submissão final} \\
+    \textbf{Data:} & Novembro / Dezembro de 2026 \\
+  \end{tabular}
+\end{center}
+
+\begin{destaque}{Resumo Executivo}
+Este trabalho apresenta o projeto, a modelagem matemática, a implementação em C++20 e a verificação
+reprodutível do programa \textbf{CCO Explorer}, desenvolvido para analisar seis modelos tridimensionais
+reais de árvores vasculares geradas pelo método \textit{Constrained Constructive Optimization} (CCO),
+com $N_{\mathrm{term}} \in \{16, 32, 64, 128, 256, 512\}$ segmentos terminais. Articulando os quatro
+eixos da ementa de BCC102 -- Teoria dos Números, Técnicas de Contagem, Relações de Recorrência e
+Relações e suas Propriedades --, o programa extrai e valida integralmente os seis arquivos VTK,
+calcula atributos geométricos 3D nas unidades originais, executa consultas determinísticas por
+aritmética modular e pelo Teorema Chinês do Resto ($i \equiv 17 \pmod{20}$), verifica identidades
+combinatórias e o Princípio da Inclusão--Exclusão sobre medianas geométricas em \texttt{Nterm128}
+($|A \cup B| = 128 + 128 - 42 = 214$), deduz e valida recorrências exatas ($e_k = 32\cdot 2^k - 1$,
+$b_k = 16\cdot 2^k - 1$, $v_k = 32\cdot 2^k$) e analisa a relação pai--filho $\mathcal{R}$, sua
+função associada $p$, seu fecho transitivo $\mathcal{R}^+$ ($179$ pares em \texttt{Nterm016}), a
+ordem parcial $\preceq$ ($317$ pares incomparáveis) e a relação de equivalência modular $\sim$. Todos
+os sete testes mínimos de aceitação (T1--T7) foram validados em C++ via \texttt{CTest} e confirmados
+por verificação cruzada independente em Python.
+\end{destaque}
+
+\tableofcontents
+\vspace{4pt}
+\hrule
+\vspace{6pt}
+
+% ============================================================================
+% 1. INTRODUCAO E OBJETIVO
+% ============================================================================
+\section{Introdução e Objetivo}
+
+O método \textit{Constrained Constructive Optimization} (CCO) é amplamente empregado na modelagem
+computacional de redes vasculares artificiais tridimensionais sujeitas a restrições geométricas e
+fisiológicas de perfusão~\cite{karch1999cco}. Embora a geração dessas árvores envolva otimização
+geométrica e equações hemodinâmicas, a estrutura resultante é uma rede discreta de conexões
+orientadas entre pontos tridimensionais e segmentos tubulares caracterizados por raios escalares.
+
+O objetivo deste Trabalho Prático consiste em projetar e implementar o \textbf{CCO Explorer}, um
+sistema reprodutível de linha de comando em C++20 que lê os seis arquivos VTK fornecidos, valida
+rigorosamente sua integridade estrutural e produz análises matemáticas fundamentadas nos quatro
+eixos de \textbf{BCC102 -- Matemática Discreta II}:
+\begin{enumerate}
+  \item \textbf{Modelagem discreta e validação (Módulo A):} extração de pontos, segmentos e raios,
+        incorporação da geometria euclidiana 3D (comprimentos e pontos médios) e classificação
+        topológica dos pontos apenas com vetores, matrizes, laços e contadores elementares.
+  \item \textbf{Teoria dos Números (Módulo B):} agrupamento determinístico por congruência módulo
+        $m = 7$, verificação de partição, Princípio da Casa dos Pombos e implementação da
+        \textbf{Trilha 1 (Algoritmo de Euclides e Teorema Chinês do Resto)}.
+  \item \textbf{Contagem e Relações de Recorrência (Módulo C):} invariantes estruturais por dupla
+        contagem, combinações $\binom{T}{2}$, princípio multiplicativo $B \times T$, Inclusão--Exclusão
+        sobre atributos 3D e resolução de recorrências por iteração e equação característica.
+  \item \textbf{Relações e suas Propriedades (Módulo D):} formalização da relação pai--filho
+        $\mathcal{R}$, matriz booleana $32 \times 32$ para \texttt{Nterm016}, análise de propriedades
+        e da inversa $\mathcal{R}^{-1}$, função pai $p$, fecho transitivo iterativo $\mathcal{R}^+$,
+        ordem parcial $\preceq$ e relação de equivalência modular $\sim$.
+\end{enumerate}
+
+Seguindo as restrições pedagógicas do enunciado, não foram empregadas estruturas especializadas de
+Estruturas de Dados I (como nós encadeados do tipo \texttt{TreeNode} ou bibliotecas externas de
+grafos), nem bibliotecas externas de leitura VTK: toda a modelagem e as transformações matemáticas
+foram implementadas explicitamente em C++20 com vetores, matrizes booleanas, laços e funções puras.
+
+% ============================================================================
+% 2. DESCRICAO DOS DADOS E PREMISSAS
+% ============================================================================
+\section{Descrição dos Dados e Premissas}
+
+O conjunto de entrada disponibilizado na pasta \texttt{dados/} contém seis arquivos no formato legado
+VTK ASCII (\texttt{DATASET POLYDATA}), nomeados \texttt{tree3D\_Nterm016.vtk} até
+\texttt{tree3D\_Nterm512.vtk}, acompanhados de imagens PNG ilustrativas de renderização tubular.
+Cada arquivo VTK organiza-se em três seções relevantes:
+\begin{itemize}
+  \item \texttt{POINTS $|V|$ float}: coordenadas tridimensionais $(x_v, y_v, z_v)$ dos pontos,
+        indexados implicitamente por $v \in V = \{0, 1, \dots, |V|-1\}$;
+  \item \texttt{LINES $|E|$ $3|E|$}: registros da forma \texttt{2 u v}, definindo segmentos
+        orientados da extremidade proximal $u$ para a distal $v$, recebendo identificadores
+        $i \in \{0, 1, \dots, |E|-1\}$ conforme a ordem de apresentação;
+  \item \texttt{CELL\_DATA $|E|$} (\texttt{scalars raio float}): atributo escalar de raio $r_i$
+        associado univocamente ao segmento $s_i$ na mesma ordenação de \texttt{LINES}.
+\end{itemize}
+
+\begin{alerta}{Premissas de Rigor sobre Unidades, Entidades e Apoio Visual}
+\textbf{(i) Unidades originais:} nenhum cabeçalho VTK declara unidades físicas (metros ou milímetros);
+todas as grandezas geométricas ($\ell_i$, $M_i$, $r_i$) são preservadas nas unidades numéricas
+originais dos arquivos.
+\textbf{(ii) Distinção conceitual:} distinguem-se rigorosamente \emph{pontos} ($v \in V$),
+\emph{segmentos} ($s_i = (u_i, v_i) \in E$) e \emph{terminais} ($t \in V$ com grau de saída nulo).
+\textbf{(iii) Apoio visual:} as imagens PNG da Figura~\ref{fig:modelos_png} servem exclusivamente como
+ilustração qualitativa da geometria 3D; todos os valores numéricos deste relatório foram calculados
+diretamente a partir dos arquivos VTK pelo executável \texttt{cco\_explorer}.
+\end{alerta}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.31\textwidth]{../dados/tree3D_Nterm016_tube.png}\hspace{1.2cm}
+  \includegraphics[width=0.31\textwidth]{../dados/tree3D_Nterm128_tube.png}
+  \caption{Apoio visual dos modelos tridimensionais fornecidos: \texttt{Nterm016} (esquerda, $16$ terminais e $31$ segmentos) e \texttt{Nterm128} (direita, $128$ terminais e $255$ segmentos). Imagens originais da coleção usadas apenas como ilustração.}
+  \label{fig:modelos_png}
+\end{figure}
+
+% ============================================================================
+% 3. MODULO A -- MODELAGEM DISCRETA E VALIDACAO
+% ============================================================================
+\section{Módulo A -- Modelagem Discreta e Validação dos Dados}
+
+\subsection{Extração, Geometria 3D e Validação (A1--A3)}
+
+O módulo \texttt{vtk\_parser} lê o cabeçalho (\texttt{\# vtk DataFile}, \texttt{ASCII},
+\texttt{DATASET POLYDATA}) e percorre as seções \texttt{POINTS}, \texttt{LINES} e \texttt{CELL\_DATA}.
+Para cada segmento $s_i$ com extremos $P_{u_i} = (x_u, y_u, z_u)$ e $P_{v_i} = (x_v, y_v, z_v)$, são
+calculados o comprimento euclidiano tridimensional e o ponto médio:
+\begin{equation}
+  \ell_i = \sqrt{(x_v - x_u)^2 + (y_v - y_u)^2 + (z_v - z_u)^2}, \qquad
+  M_i = \left(\frac{x_u + x_v}{2},\; \frac{y_u + y_v}{2},\; \frac{z_u + z_v}{2}\right).
+\end{equation}
+
+Na validação automática (item A3), o programa verifica: (i) correspondência exata entre as
+quantidades declaradas e lidas de pontos, linhas e dados de célula; (ii) total de inteiros em
+\texttt{LINES} igual a $3|E|$ e aridade $2$ em cada linha; (iii) existência de todos os índices
+$u_i, v_i \in \{0, \dots, |V|-1\}$ sem laços próprios ($u_i \neq v_i$); (iv) correspondência
+biunívoca de um raio positivo e finito por segmento; e (v) ausência de valores excedentes após
+\texttt{CELL\_DATA}. Um teste unitário negativo dedicado confirma que um VTK corrompido (referenciando
+índice inexistente) é rejeitado com \texttt{validation.ok = false}.
+
+\subsection{Identificação Estrutural dos Pontos e Tabela Consolidada (A4)}
+
+Por meio de laços simples sobre $E$, contabilizam-se o grau de entrada $\deg^-(v)$ e o grau de saída
+$\deg^+(v)$ de cada ponto $v \in V$. Em \textbf{todos os seis arquivos}, a verificação empírica
+confirmou sem exceção exatamente três classes disjuntas de vértices:
+\begin{itemize}
+  \item \textbf{Entrada única:} somente o ponto $0$ apresenta $(\deg^-(0), \deg^+(0)) = (0, 1)$,
+        confirmando que o ponto de entrada \emph{não} é uma bifurcação;
+  \item \textbf{Bifurcações ($B$):} pontos internos com $(\deg^-(v), \deg^+(v)) = (1, 2)$;
+  \item \textbf{Terminais ($T$):} pontos distais com $(\deg^-(v), \deg^+(v)) = (1, 0)$.
+\end{itemize}
+Nenhum ponto anômalo foi detectado em qualquer modelo. A Tabela~\ref{tab:consolidada} consolida
+as contagens estruturais (em concordância exata com a Tabela 1 do enunciado) e as medidas
+geométricas 3D extraídas, também exportadas em \texttt{resultados/resumo\_consolidado.csv} e nos
+arquivos individuais por segmento em \texttt{resultados/segmentos/}.
+
+\begin{table}[H]
+  \centering
+  \caption{Tabela consolidada dos seis modelos CCO 3D (Módulo A). Comprimentos e raios estão nas unidades numéricas originais dos arquivos VTK.}
+  \label{tab:consolidada}
+  \footnotesize
+  \begin{tabular}{lrrrrrrrrrc}
+    \toprule
+    Arquivo VTK & $N_{\mathrm{term}}$ & $|V|$ & $|E|$ & $B$ & $\bar{\ell}$ & $\sum \ell_i$ & $r_{\min}$ & $\bar{r}$ & $r_{\max}$ & Valid. \\
+    \midrule
+    \texttt{Nterm016.vtk} & 16  & 32   & 31   & 15  & 0,012246 & 0,379618 & 0,226124 & 0,369303 & 0,687011 & OK \\
+    \texttt{Nterm032.vtk} & 32  & 64   & 63   & 31  & 0,009475 & 0,596916 & 0,213172 & 0,368547 & 0,837286 & OK \\
+    \texttt{Nterm064.vtk} & 64  & 128  & 127  & 63  & 0,007220 & 0,916932 & 0,205228 & 0,361438 & 1,017849 & OK \\
+    \texttt{Nterm128.vtk} & 128 & 256  & 255  & 127 & 0,005404 & 1,378086 & 0,145407 & 0,353389 & 1,225849 & OK \\
+    \texttt{Nterm256.vtk} & 256 & 512  & 511  & 255 & 0,004090 & 2,090078 & 0,119170 & 0,292110 & 1,247203 & OK \\
+    \texttt{Nterm512.vtk} & 512 & 1024 & 1023 & 511 & 0,003097 & 3,167970 & 0,095569 & 0,241521 & 1,266555 & OK \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Nota-se um comportamento geometricamente coerente com árvores que preenchem um volume limitado:
+à medida que $N_{\mathrm{term}}$ dobra de $16$ para $512$, o comprimento total da rede cresce de
+$0{,}3796$ para $3{,}1680$ ($8{,}3\times$), enquanto o comprimento médio por segmento diminui
+monotonamente de $0{,}01225$ para $0{,}00310$ e o raio mínimo decresce de $0{,}2261$ para $0{,}0956$
+(enquanto o raio máximo do tronco proximal aumenta de $0{,}6870$ para $1{,}2666$ para suprir maior
+número de terminais).
+
+% ============================================================================
+% 4. MODULO B -- TEORIA DOS NUMEROS
+% ============================================================================
+\section{Módulo B -- Teoria dos Números Aplicada à Consulta dos Segmentos}
+
+\subsection{Parte B0: Classes Modulares, Partição e Casa dos Pombos}
+
+No modelo \texttt{tree3D\_Nterm128.vtk} ($|E| = 255$), os segmentos recebem identificadores
+$i \in S = \{0, 1, \dots, 254\}$ pela ordem em \texttt{LINES}. Adotando $m = 7$, definem-se as
+sete classes de resíduos:
+\begin{equation}
+  C_j = \{i \in S : i \equiv j \pmod{7}\}, \qquad j \in \{0, 1, 2, 3, 4, 5, 6\}.
+\end{equation}
+
+Pelo Algoritmo da Divisão Euclidiana, cada inteiro $i \in S$ possui resto único $j = i \bmod 7 \in
+\{0,\dots,6\}$, garantindo $C_j \cap C_k = \emptyset$ para $j \neq k$ e $\bigcup_{j=0}^{6} C_j = S$.
+Essa propriedade foi validada explicitamente no programa (B0.2), confirmando disjunção par a par e
+$\sum_{j=0}^{6} |C_j| = 255 = |E|$.
+
+Pelo \textbf{Princípio da Casa dos Pombos} generalizado (B0.3), ao distribuir $|E| = 255$ segmentos
+(pombos) em $m = 7$ classes (casas), pelo menos uma classe possui tamanho mínimo:
+\begin{equation}
+  \max_{0 \le j \le 6} |C_j| \ge \left\lceil \frac{|E|}{m} \right\rceil
+  = \left\lceil \frac{255}{7} \right\rceil = \lceil 36{,}42857\dots \rceil = 37.
+\end{equation}
+Como $255 = 36 \cdot 7 + 3$, exatamente três classes ($C_0, C_1, C_2$) contêm $37$ segmentos e quatro
+classes ($C_3, C_4, C_5, C_6$) contêm $36$, confirmando que o limite inferior de $37$ é atingido
+com igualdade. A Tabela~\ref{tab:mod7} e a Figura~\ref{fig:mod7} apresentam as estatísticas por classe.
+
+\begin{table}[H]
+  \centering
+  \caption{Agrupamento modular $C_j = \{i : i \equiv j \pmod 7\}$ em \texttt{tree3D\_Nterm128.vtk} ($|E| = 255$).}
+  \label{tab:mod7}
+  \small
+  \begin{tabular}{ccccc}
+    \toprule
+    Classe & Resíduo $j$ & Cardinalidade $|C_j|$ & Comprimento médio $\bar{\ell}_j$ & Raio médio $\bar{r}_j$ \\
+    \midrule
+    $C_0$ & 0 & 37 & 0,00563028 & 0,35982422 \\
+    $C_1$ & 1 & 37 & 0,00511812 & 0,33768503 \\
+    $C_2$ & 2 & 37 & 0,00480163 & 0,36795055 \\
+    $C_3$ & 3 & 36 & 0,00638588 & 0,34726590 \\
+    $C_4$ & 4 & 36 & 0,00504980 & 0,36465192 \\
+    $C_5$ & 5 & 36 & 0,00523395 & 0,36811322 \\
+    $C_6$ & 6 & 36 & 0,00562858 & 0,32808484 \\
+    \midrule
+    \textbf{Total / Global} & -- & \textbf{255} & \textbf{0,00540426} & \textbf{0,35338896} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}[H]
+  \centering
+  \resizebox{0.92\linewidth}{!}{\input{figuras/fig_modular_b0.tex}}
+  \caption{Distribuição das classes modulares módulo $7$ em \texttt{Nterm128}: (a) frequências $|C_j|$ confrontadas com o limite inferior do Princípio da Casa dos Pombos ($\lceil 255/7 \rceil = 37$); (b) estabilidade do raio médio por classe em torno da média global ($0{,}3534$).}
+  \label{fig:mod7}
+\end{figure}
+
+\textbf{Consulta por classes de resíduos (B0.4):} a congruência $i \equiv j \pmod 7$ permite
+indexar e consultar segmentos de forma determinística e em tempo constante por registro
+(\texttt{i \% 7 == j}), particionando o conjunto de registros em blocos balanceados (diferença máxima
+de $1$ elemento) para processamento paralelo, amostragem reprodutível ou auditoria por lotes. A prova
+de que $\equiv \pmod 7$ define uma relação de equivalência é retomada no Módulo D (Seção~\ref{sec:d6}).
+
+\subsection{Parte B1 -- Trilha 1: Algoritmo de Euclides e Teorema Chinês do Resto}
+
+Optou-se pela \textbf{Trilha 1 (recomendada)} por conectar diretamente divisibilidade, identidade de
+Bézout e resolução de sistemas de congruências lineares simultâneas. Considera-se o sistema:
+\begin{equation}
+  \begin{cases}
+    i \equiv 1 \pmod{4}, \\
+    i \equiv 2 \pmod{5}.
+  \end{cases}
+  \label{eq:sistema_tcr}
+\end{equation}
+
+\textbf{Passo 1 -- Algoritmo de Euclides para $\gcd(4, 5)$:}
+\begin{align*}
+  4 &= 0 \cdot 5 + 4, \\
+  5 &= 1 \cdot 4 + 1, \\
+  4 &= 4 \cdot 1 + 0 \quad \Longrightarrow \quad \gcd(4, 5) = 1.
+\end{align*}
+Pelo Algoritmo de Euclides Estendido, obtém-se a identidade de Bézout $4\cdot(-1) + 5\cdot(1) = 1$.
+Como os módulos $m_1 = 4$ e $m_2 = 5$ são coprimos, o \textbf{Teorema Chinês do Resto (TCR)} garante
+solução única módulo $M = m_1 m_2 = 20$.
+
+\textbf{Passo 2 -- Construção pelo TCR:}
+Definindo $M_1 = M/m_1 = 5$ e $M_2 = M/m_2 = 4$, determinam-se os inversos multiplicativos modulares:
+\begin{itemize}
+  \item $M_1 y_1 \equiv 1 \pmod 4 \implies 5 y_1 \equiv y_1 \equiv 1 \pmod 4 \implies y_1 = 1$;
+  \item $M_2 y_2 \equiv 1 \pmod 5 \implies 4 y_2 \equiv -y_2 \equiv 1 \pmod 5 \implies y_2 = 4$
+        (pois $4 \cdot 4 = 16 \equiv 1 \pmod 5$).
+\end{itemize}
+Combinando os termos:
+\begin{equation}
+  x_0 \equiv a_1 M_1 y_1 + a_2 M_2 y_2 = 1 \cdot 5 \cdot 1 + 2 \cdot 4 \cdot 4 = 5 + 32 = 37
+  \equiv 17 \pmod{20}.
+\end{equation}
+Verificação imediata: $17 = 4 \cdot 4 + 1 \equiv 1 \pmod 4$ e $17 = 3 \cdot 5 + 2 \equiv 2 \pmod 5$.
+Logo, o sistema~\eqref{eq:sistema_tcr} equivale à congruência única $i \equiv 17 \pmod{20}$.
+
+\textbf{Passo 3 -- Validação computacional nos dados:}
+A seleção foi implementada de modo duplo em \texttt{run\_crt\_query}: (i) diretamente pelas duas
+congruências (\texttt{i \% 4 == 1} e \texttt{i \% 5 == 2}) e (ii) pela congruência equivalente
+(\texttt{i \% 20 == 17}).
+A Tabela~\ref{tab:tcr} mostra a coincidência absoluta dos dois métodos em \texttt{Nterm128} e
+\texttt{Nterm512}. Em \texttt{Nterm128}, os $12$ identificadores selecionados são
+$17$, $37$, $57$, $77$, $97$, $117$, $137$, $157$, $177$, $197$, $217$ e $237$; em \texttt{Nterm512},
+os $51$ identificadores formam a progressão aritmética $\{17 + 20k : 0 \le k \le 50\}$, encerrando em
+$1017 < 1023$.
+
+\begin{table}[H]
+  \centering
+  \caption{Resultados da Trilha 1 (TCR: $i \equiv 1 \pmod 4,\; i \equiv 2 \pmod 5 \iff i \equiv 17 \pmod{20}$).}
+  \label{tab:tcr}
+  \small
+  \begin{tabular}{lcccccc}
+    \toprule
+    Modelo & $|E|$ & Direto & Equivalente & Coincidem & Comprimento médio & Raio médio \\
+    \midrule
+    \texttt{tree3D\_Nterm128.vtk} & 255  & 12 & 12 & SIM & 0,00532665 & 0,35887719 \\
+    \texttt{tree3D\_Nterm512.vtk} & 1023 & 51 & 51 & SIM & 0,00332587 & 0,24230171 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{alerta}{Critério de Pertinência e Limitações da Classificação de Identificadores}
+Como o índice $i$ decorre unicamente da posição sequencial do segmento na seção \texttt{LINES} do
+arquivo VTK, pertencer à classe $C_0$ ou satisfazer $i \equiv 17 \pmod{20}$ \textbf{não confere
+propriedade fisiológica especial} ao vaso. Observa-se, inclusive, que as médias geométricas das
+amostras TCR ($0{,}3589$ em \texttt{Nterm128}; $0{,}2423$ em \texttt{Nterm512}) flutuam próximas às
+médias globais respectivas ($0{,}3534$ e $0{,}2415$), confirmando que a utilidade dessas técnicas é
+puramente computacional (seleção determinística, particionamento e verificação reprodutível).
+\end{alerta}
+
+% ============================================================================
+% 5. MODULO C -- CONTAGEM E RECORRENCIAS
+% ============================================================================
+\section{Módulo C -- Contagem e Relações de Recorrência}
+
+\subsection{Parte C1: Técnicas de Contagem e Inclusão--Exclusão 3D}
+
+\subsubsection{Relações estruturais por dupla contagem (C1.1)}
+Em todos os seis modelos, a contagem empírica confirma cinco identidades estruturais:
+\begin{equation}
+  B = T - 1, \qquad |E| = 2T - 1, \qquad |V| = 2T, \qquad |V| = |E| + 1, \qquad |V| = 1 + B + T.
+\end{equation}
+A origem estrutural dessas igualdades decorre diretamente de \textbf{dupla contagem de graus} sobre
+os segmentos orientados. Sendo $1$ ponto de entrada com $(\deg^-, \deg^+) = (0, 1)$, $B$ bifurcações
+com $(1, 2)$ e $T$ terminais com $(1, 0)$:
+\begin{align}
+  |E| &= \sum_{v \in V} \deg^+(v) = 1\cdot 1 + 2\cdot B + 0\cdot T = 1 + 2B, \\
+  |E| &= \sum_{v \in V} \deg^-(v) = 0\cdot 1 + 1\cdot B + 1\cdot T = B + T.
+\end{align}
+Igualando as duas expressões de $|E|$, obtém-se $1 + 2B = B + T \implies B = T - 1$. Substituindo de
+volta, resultam $|E| = (T - 1) + T = 2T - 1$ e $|V| = 1 + B + T = 2T = |E| + 1$.
+
+\subsubsection{Combinações de terminais e Princípio Multiplicativo (C1.2--C1.3)}
+Para selecionar dois terminais distintos sem considerar ordem e sem repetição, busca-se o número de
+subconjuntos de cardinalidade $2$ de um conjunto de $T$ elementos, dado pelo coeficiente binomial
+$\binom{T}{2} = \frac{T(T-1)}{2}$:
+\begin{itemize}
+  \item \texttt{Nterm016} ($T = 16$): $\binom{16}{2} = \frac{16 \times 15}{2} = \mathbf{120}$ pares não ordenados;
+  \item \texttt{Nterm128} ($T = 128$): $\binom{128}{2} = \frac{128 \times 127}{2} = \mathbf{8128}$ pares não ordenados.
+\end{itemize}
+
+Para contar pares ordenados $(b, t)$ formados por uma bifurcação $b$ e um terminal $t$, aplica-se o
+\textbf{Princípio Fundamental da Contagem (Regra do Produto)}, pois a escolha de $b$ (entre $B$ opções)
+e a escolha de $t$ (entre $T$ opções) são independentes e definem o produto cartesiano de tamanho
+$B \times T$:
+\begin{itemize}
+  \item \texttt{Nterm016} ($B = 15, T = 16$): $15 \times 16 = \mathbf{240}$ pares ordenados $(b, t)$;
+  \item \texttt{Nterm128} ($B = 127, T = 128$): $127 \times 128 = \mathbf{16256}$ pares ordenados $(b, t)$.
+\end{itemize}
+
+\subsubsection{Princípio da Inclusão--Exclusão sobre a geometria 3D (C1.4)}
+Em \texttt{tree3D\_Nterm128.vtk} ($|E| = 255$, ímpar), as medianas exatas dos raios e dos
+comprimentos 3D são o $128^{\circ}$ elemento ordenado de cada atributo:
+\[
+  r_{\mathrm{med}} = 0{,}28469290, \qquad \ell_{\mathrm{med}} = 0{,}00530984.
+\]
+Definindo $A = \{i \in S : r_i \ge r_{\mathrm{med}}\}$ e $B = \{i \in S : \ell_i \ge \ell_{\mathrm{med}}\}$,
+a contagem direta sobre os $255$ segmentos forneceu:
+\begin{equation}
+  |A| = 128, \qquad |B| = 128, \qquad |A \cap B| = 42, \qquad |A \cup B| = 214.
+\end{equation}
+Verificando a identidade da Inclusão--Exclusão:
+\[
+  |A| + |B| - |A \cap B| = 128 + 128 - 42 = 214 = |A \cup B| \quad (\checkmark),
+\]
+com $|A \setminus B| = 86$, $|B \setminus A| = 86$ e $|(A \cup B)^c| = 41$ (soma $42 + 86 + 86 + 41 = 255$).
+
+\textbf{Interpretação geométrica real:} sob independência entre raio e comprimento, esperar-se-ia
+$|A \cap B| \approx \frac{128 \times 128}{255} \approx 64{,}25$ segmentos simultaneamente calibrosos
+e longos. O valor observado ($42$, ou apenas $16{,}5\%$ da rede) evidencia uma \emph{associação
+negativa} real na geometria CCO (Figura~\ref{fig:ie}): segmentos proximais de grande raio sofrem
+ramificações frequentes e tornam-se mais curtos ($A \setminus B$: $86$ segmentos), ao passo que
+ramos distais mais finos estendem-se por distâncias maiores para alcançar pontos terminais no domínio
+tridimensional ($B \setminus A$: $86$ segmentos).
+
+\begin{figure}[H]
+  \centering
+  \resizebox{0.82\linewidth}{!}{\input{figuras/fig_inclusao_exclusao.tex}}
+  \caption{Dispersão 2D de raio $r_i$ versus comprimento 3D $\ell_i$ dos $255$ segmentos de \texttt{Nterm128}, particionados pelas medianas $r_{\mathrm{med}}$ e $\ell_{\mathrm{med}}$. A sub-representação do quadrante $A \cap B$ ($42$ segmentos) ilustra a identidade $|A \cup B| = 128 + 128 - 42 = 214$ e a tendência geométrica da rede.}
+  \label{fig:ie}
+\end{figure}
+
+\subsection{Parte C2: Relações de Recorrência e Validação}
+
+Ordenando os seis modelos por $N_{\mathrm{term}} = 16 \cdot 2^k$ ($k = 0, 1, 2, 3, 4, 5$), observa-se
+a sequência de segmentos $e_0 = 31, e_1 = 63, e_2 = 127, e_3 = 255, e_4 = 511, e_5 = 1023$. Cada
+termo satisfaz a recorrência linear não homogênea de primeira ordem (C2.1):
+\begin{equation}
+  e_k = 2 e_{k-1} + 1 \quad (k \ge 1), \qquad e_0 = 31.
+  \label{eq:rec_e}
+\end{equation}
+
+\textbf{Resolução por iteração / substituição (C2.2):}
+Desenrolando~\eqref{eq:rec_e} sucessivamente:
+\begin{align*}
+  e_k &= 2 e_{k-1} + 1 \\
+      &= 2(2 e_{k-2} + 1) + 1 = 2^2 e_{k-2} + 2 + 1 \\
+      &= 2^3 e_{k-3} + 2^2 + 2 + 1 \\
+      &\;\;\vdots \\
+      &= 2^k e_0 + \sum_{j=0}^{k-1} 2^j = 2^k \cdot 31 + (2^k - 1) = 32 \cdot 2^k - 1 = 2^{k+5} - 1.
+\end{align*}
+
+\textbf{Resolução pelo método da equação característica (C2.3):}
+Reescrevendo $e_k - 2 e_{k-1} = 1$:
+\begin{enumerate}
+  \item \emph{Solução homogênea:} para $e_k^{(h)} - 2 e_{k-1}^{(h)} = 0$, a equação característica é
+        $r - 2 = 0 \implies r = 2$, logo $e_k^{(h)} = c \cdot 2^k$.
+  \item \emph{Solução particular:} como o termo forçante é constante ($1 \neq 2^k$), testa-se
+        $e_k^{(p)} = d$, obtendo $d - 2d = 1 \implies d = -1$.
+  \item \emph{Solução geral e condição inicial:} $e_k = c \cdot 2^k - 1$. Usando $e_0 = 31$,
+        tem-se $c \cdot 2^0 - 1 = 31 \implies c = 32$. Portanto:
+        \begin{equation}
+          e_k = 32 \cdot 2^k - 1 = 2^{k+5} - 1.
+        \end{equation}
+\end{enumerate}
+
+\textbf{Segundas relações para bifurcações e pontos (C2.4):}
+Para as bifurcações $b_k$, obtém-se $b_k = 2 b_{k-1} + 1$ com $b_0 = 15$, cuja solução é
+$b_k = 16 \cdot 2^k - 1 = 2^{k+4} - 1 = T_k - 1$. Para o número de pontos $v_k$, a recorrência
+homogênea $v_k = 2 v_{k-1}$ com $v_0 = 32$ produz $v_k = 32 \cdot 2^k = 2^{k+5} = 2 T_k$. Para
+generalizar essas relações a coleções arbitrárias, exigem-se três pressupostos estruturais: (i)
+topologia acíclica conexa com raiz única de grau de saída $1$; (ii) ramificação estritamente binária
+em todo ponto interno (sem trifurcações nem anastomoses); e (iii) duplicação exata do parâmetro
+$T_k = T_0 \cdot 2^k$ entre modelos consecutivos. A Tabela~\ref{tab:recorrencia} e a
+Figura~\ref{fig:recorrencia} confirmam aderência exata em todos os seis arquivos VTK.
+
+\begin{table}[H]
+  \centering
+  \caption{Confronto das recorrências deduzidas com os valores reais dos seis arquivos VTK (Parte C2).}
+  \label{tab:recorrencia}
+  \small
+  \begin{tabular}{ccccccccc}
+    \toprule
+    $k$ & $N_{\mathrm{term}} = 16\cdot 2^k$ & $|V|$ obs. & $v_k = 32\cdot 2^k$ & $e_k$ obs. & $32\cdot 2^k - 1$ & $B$ obs. & $b_k = 16\cdot 2^k - 1$ & Confere \\
+    \midrule
+    0 & 16  & 32   & 32   & 31   & 31   & 15  & 15  & SIM \\
+    1 & 32  & 64   & 64   & 63   & 63   & 31  & 31  & SIM \\
+    2 & 64  & 128  & 128  & 127  & 127  & 63  & 63  & SIM \\
+    3 & 128 & 256  & 256  & 255  & 255  & 127 & 127 & SIM \\
+    4 & 256 & 512  & 512  & 511  & 511  & 255 & 255 & SIM \\
+    5 & 512 & 1024 & 1024 & 1023 & 1023 & 511 & 511 & SIM \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}[H]
+  \centering
+  \resizebox{0.84\linewidth}{!}{\input{figuras/fig_recorrencia.tex}}
+  \caption{Crescimento exato das contagens estruturais $|V|$, $|E|$ e $B$ ao longo da sequência de modelos ($k = 0, \dots, 5$), validando as soluções fechadas das recorrências.}
+  \label{fig:recorrencia}
+\end{figure}
+
+\begin{alerta}{Interpretação Rigorosa das Recorrências}
+As recorrências obtidas descrevem exclusivamente \textbf{contagens globais} ao longo de uma família
+de seis arquivos VTK parametrizados por $N_{\mathrm{term}} = 16 \cdot 2^k$. Elas \emph{não}
+comprovam que os segmentos de um modelo menor permaneçam geometricamente inalterados no modelo maior
+(no CCO, novas inserções alteram bifurcações e raios globais), tampouco constituem uma lei
+fisiológica de crescimento por níveis hierárquicos da árvore.
+\end{alerta}
+
+% ============================================================================
+% 6. MODULO D -- RELACOES, REPRESENTACOES E PROPRIEDADES
+% ============================================================================
+\section{Módulo D -- Relações, Representações e Propriedades}
+
+\subsection{Relação Pai--Filho, Representações e Propriedades (D1--D3)}
+
+Sobre o conjunto de pontos $V = \{0, 1, \dots, |V|-1\}$, define-se explicitamente a relação binária
+pai--filho:
+\begin{equation}
+  \mathcal{R} = \{(u, v) \in V \times V : \text{existe um segmento orientado de } u \text{ para } v\}.
+\end{equation}
+
+Em \texttt{tree3D\_Nterm016.vtk} ($|V| = 32$), têm-se $|\mathcal{R}| = 31$ pares ordenados, como
+$(0,6)$, $(6,12)$, $(12,24)$, $(24,25)$, $(24,13)$, $(12,7)$, $(6,18)$ e $(18,14)$. O domínio e a
+imagem obtidos diretamente do arquivo são:
+\begin{align*}
+  \operatorname{dom}(\mathcal{R}) &= \{0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30\}
+  \quad (|\operatorname{dom}(\mathcal{R})| = 16 = 1 + B), \\
+  \operatorname{im}(\mathcal{R}) &= V \setminus \{0\} = \{1, 2, \dots, 31\}
+  \quad (|\operatorname{im}(\mathcal{R})| = 31).
+\end{align*}
+Seguindo o item D2, gerou-se a lista de pares para os modelos analisados e a matriz booleana densa
+$A = [a_{uv}]_{32 \times 32}$ ($a_{uv} = 1 \iff (u,v) \in \mathcal{R}$, com exatamente $31$ entradas
+iguais a $1$) somente para \texttt{Nterm016}, evitando matrizes densas nos modelos maiores.
+
+A investigação formal e programática das propriedades de $\mathcal{R}$ em \texttt{Nterm016} resulta:
+\begin{itemize}
+  \item \textbf{Reflexividade -- NÃO} (é \emph{irreflexiva}): nenhum segmento conecta um ponto a si
+        mesmo; contraexemplo: $(0, 0) \notin \mathcal{R}$.
+  \item \textbf{Simetria -- NÃO}: a orientação proximal $\to$ distal é unidirecional; contraexemplo:
+        $(0, 6) \in \mathcal{R}$, mas $(6, 0) \notin \mathcal{R}$.
+  \item \textbf{Antissimetria -- SIM} (de fato, \emph{assimétrica}): não existem pares recíprocos
+        $(u,v), (v,u) \in \mathcal{R}$ com $u \neq v$; logo, a implicação
+        $(u,v) \in \mathcal{R} \land (v,u) \in \mathcal{R} \implies u = v$ vale por vacuidade em todos os pares.
+  \item \textbf{Transitividade -- NÃO}: conexões de dois passos não formam segmento direto;
+        contraexemplo: $(0, 6) \in \mathcal{R}$ e $(6, 12) \in \mathcal{R}$, porém $(0, 12) \notin \mathcal{R}$.
+\end{itemize}
+
+\textbf{Relação inversa $\mathcal{R}^{-1}$:} definida por $\mathcal{R}^{-1} = \{(v, u) : (u, v) \in \mathcal{R}\}$
+(relação ``filho--pai''), tem matriz $A^T$, $\operatorname{dom}(\mathcal{R}^{-1}) = V \setminus \{0\}$ e
+$\operatorname{im}(\mathcal{R}^{-1}) = \operatorname{dom}(\mathcal{R})$. Ela preserva a irreflexividade,
+não simetria, antissimetria e não transitividade, mas adquire uma propriedade crucial ausente em
+$\mathcal{R}$: $\mathcal{R}^{-1}$ é \textbf{funcional} sobre $V \setminus \{0\}$.
+
+\subsection{Função Associada \texorpdfstring{$p : V \setminus \{0\} \to V$}{p: V\textbackslash\{0\} -> V} (D4)}
+
+Uma relação $f \subseteq (V \setminus \{0\}) \times V$ constitui função se, e somente se, todo
+$v \in V \setminus \{0\}$ está associado a \emph{exatamente um} elemento $u \in V$. Nos dados reais
+de \texttt{Nterm016} (e de todos os demais cinco arquivos), verificou-se que $\deg^-(0) = 0$ (razão
+pela qual $0$ deve ser excluído do domínio) e $\deg^-(v) = 1$ para todo $v \in V \setminus \{0\}$.
+Portanto, $p : V \setminus \{0\} \to V$ que associa a cada ponto não inicial seu único pai é uma
+\textbf{função bem definida} (coincidindo com o gráfico de $\mathcal{R}^{-1}$). Contudo:
+\begin{itemize}
+  \item $p$ \textbf{não é injetora}, pois cada bifurcação possui dois filhos distintos com o mesmo
+        pai -- contraexemplo verificado: $p(2) = p(11) = 10$ (e também $p(12) = p(18) = 6$);
+  \item $p$ \textbf{não é sobrejetora} sobre $V$, pois nenhum ponto terminal é pai de outro ponto --
+        contraexemplo verificado: o terminal $1 \notin \operatorname{im}(p)$.
+\end{itemize}
+
+\subsection{Fecho Transitivo \texorpdfstring{$\mathcal{R}^+$}{R+} e Ordem Parcial \texorpdfstring{$\preceq$}{<=} (D5)}
+
+Para construir a relação de ancestralidade estrita $\mathcal{R}^+$ em \texttt{Nterm016} sem
+estruturas avançadas de dados, utilizou-se o procedimento iterativo de ponto fixo sobre a matriz
+booleana $32 \times 32$: partindo de $M^{(0)} = A$, acrescentam-se todos os pares $(u, w)$ tais que
+exista $v \in V$ com $M[u][v] = 1$ e $M[v][w] = 1$, repetindo o laço até não surgirem novos pares.
+
+Em \texttt{Nterm016}, o procedimento convergiu em exatamente \textbf{4 iterações}, adicionando
+sucessivamente $+30$, $+52$, $+62$ e $+4$ pares ($148$ pares de ancestralidade indireta), totalizando
+$|\mathcal{R}^+| = 31 + 148 = \mathbf{179}$ pares (conferido também contra o algoritmo de Warshall
+na suíte de testes). Como exemplo verificado diretamente nos dados:
+\[
+  (0, 6) \in \mathcal{R} \;\land\; (6, 12) \in \mathcal{R} \;\Longrightarrow\;
+  (0, 12) \in \mathcal{R}^+ \setminus \mathcal{R}; \qquad
+  (2, 22) \in \mathcal{R} \;\land\; (22, 3) \in \mathcal{R} \;\Longrightarrow\;
+  (2, 3) \in \mathcal{R}^+ \setminus \mathcal{R}.
+\]
+
+A Figura~\ref{fig:matrizes_d} contrasta a esparsidade de $A$ ($31$ entradas $1$) com o fecho
+$\mathcal{R}^+$ ($179$ entradas $1$), evidenciando visualmente que a linha $0$ passa a ter $31$
+entradas iguais a $1$ (o ponto de entrada $0$ é ancestral estrito de todos os demais pontos).
+
+\begin{figure}[H]
+  \centering
+  \resizebox{0.90\linewidth}{!}{\input{figuras/fig_matrizes_d.tex}}
+  \caption{Representação matricial $32 \times 32$ para \texttt{tree3D\_Nterm016.vtk}: (a) matriz $A$ da relação pai--filho $\mathcal{R}$ ($31$ pares); (b) fecho transitivo $\mathcal{R}^+$ destacando conexões diretas (verde-petróleo) e ancestralidade indireta (laranja, $148$ pares).}
+  \label{fig:matrizes_d}
+\end{figure}
+
+Definindo a relação de ancestralidade ampla $\preceq \; = \mathcal{R}^+ \cup \{(v, v) : v \in V\}$
+(com $|\preceq| = 179 + 32 = 211$ pares), verifica-se que $(V, \preceq)$ é uma \textbf{ordem parcial}:
+\begin{enumerate}
+  \item \emph{Reflexiva:} por construção, $(v, v) \in \preceq$ para todo $v \in V$;
+  \item \emph{Antissimétrica:} como a rede é acíclica, não existe caminho orientado simultâneo de $u$
+        a $v$ e de $v$ a $u$ com $u \neq v$; logo, $u \preceq v \land v \preceq u \implies u = v$;
+  \item \emph{Transitiva:} sendo $\mathcal{R}^+$ transitivo e o acréscimo da diagonal $\Delta_V$
+        preservando a transitividade, $u \preceq v \land v \preceq w \implies u \preceq w$.
+\end{enumerate}
+Adicionalmente, $0$ é o \emph{elemento mínimo} ($0 \preceq v$ para todo $v \in V$) e os $16$ terminais
+são elementos maximais. Contudo, $\preceq$ \textbf{não é uma ordem total}: dos $\binom{32}{2} = 496$
+pares não ordenados de pontos distintos, $179$ são comparáveis e $\mathbf{317}$ são
+\textbf{incomparáveis} (por exemplo, $\{1, 3\}$ ou os irmãos $\{12, 18\}$, nos quais $12 \not\preceq 18$
+e $18 \not\preceq 12$, pois pertencem a ramos distintos após a bifurcação no ponto $6$).
+
+\subsection{Relação de Equivalência Modular (D6)}
+\label{sec:d6}
+
+Retomando o conjunto de identificadores $S = \{0, 1, \dots, 254\}$ de \texttt{Nterm128}, define-se:
+\begin{equation}
+  i \sim j \iff i \equiv j \pmod{7} \iff 7 \mid (i - j).
+\end{equation}
+\textbf{Demonstração de que $\sim$ é relação de equivalência:} para quaisquer $i, j, k \in S$:
+\begin{itemize}
+  \item \emph{Reflexiva:} $i - i = 0 = 7 \cdot 0 \implies 7 \mid (i - i) \implies i \sim i$;
+  \item \emph{Simétrica:} se $i \sim j$, então $i - j = 7q$ ($q \in \mathbb{Z}$), logo $j - i = 7(-q)
+        \implies j \sim i$;
+  \item \emph{Transitiva:} se $i \sim j$ e $j \sim k$, então $i - j = 7q_1$ e $j - k = 7q_2$, donde
+        $i - k = (i - j) + (j - k) = 7(q_1 + q_2) \implies i \sim k$.
+\end{itemize}
+O programa também verificou exaustivamente essas três propriedades sobre todos os $255$ elementos de
+$S$ e comprovou que as sete classes de equivalência $[0], [1], \dots, [6]$ induzidas por $\sim$
+coincidem elemento a elemento com a partição $C_0, C_1, \dots, C_6$ construída no Módulo B. Isso
+ilustra o Teorema Fundamental das Relações de Equivalência: toda relação de equivalência em $S$
+induz uma partição de $S$, e reciprocamente.
+
+% ============================================================================
+% 7. DISCUSSAO FUNDAMENTADA (Q1-Q5)
+% ============================================================================
+\section{Resultados Comparativos e Discussão (Questões Q1--Q5)}
+
+Respondendo fundamentadamente às cinco questões propostas na Seção 12 do enunciado:
+
+\textbf{Q1. Como as coordenadas 3D, o conjunto de pontos e a relação de pares ordenados descrevem
+aspectos diferentes do mesmo modelo vascular?}\\
+O conjunto de pontos $V = \{0,\dots,|V|-1\}$ captura apenas a \emph{cardinalidade e identidade
+discreta} das junções, entrada e terminações da rede, sem informação espacial ou conectividade.
+A relação de pares ordenados $\mathcal{R} \subseteq V \times V$ descreve exclusivamente a
+\emph{topologia orientada} (quem alimenta quem, bifurcações, ancestralidade e hierarquia), sendo
+invariante a rotações, translações ou deformações métricas. Já as coordenadas 3D $(x,y,z)$ e os
+raios $r_i$ descrevem a \emph{geometria métrica embebida no espaço}, permitindo medir comprimentos
+$\ell_i$, pontos médios $M_i$ e padrões físicos como a associação negativa entre $r_i$ e $\ell_i$
+revelada na Inclusão--Exclusão em \texttt{Nterm128}.
+
+\textbf{Q2. Quais propriedades matemáticas pertencem à relação pai--filho e quais surgem apenas
+após considerar a ancestralidade?}\\
+A relação direta pai--filho $\mathcal{R}$ é \emph{irreflexiva}, \emph{antissimétrica} (e assimétrica),
+porém \emph{não reflexiva}, \emph{não simétrica} e \emph{não transitiva}. Ao passar ao fecho
+transitivo $\mathcal{R}^+$ (ancestralidade estrita), \textbf{emerge a transitividade} mantendo-se a
+irreflexividade e a antissimetria (ordem parcial estrita). Ao incorporar a diagonal em
+$\preceq = \mathcal{R}^+ \cup \Delta_V$, \textbf{emerge a reflexividade}, completando os três axiomas
+de uma \emph{ordem parcial} com elemento mínimo ($0$). Em contraste, a propriedade de unicidade de
+antecessor (funcionalidade da inversa $\mathcal{R}^{-1}$) é exclusiva de $\mathcal{R}$ e perde-se
+em $(\mathcal{R}^+)^{-1}$, pois um ponto distante possui múltiplos ancestrais ao longo do caminho
+até a raiz.
+
+\textbf{Q3. Que relações entre terminais, bifurcações, pontos e segmentos foram observadas nos seis
+arquivos? Quais hipóteses estruturais justificam essas relações?}\\
+Nos seis arquivos verificaram-se exatamente $B = T - 1$, $|E| = 2T - 1$, $|V| = 2T$, $|V| = |E| + 1$
+e $|V| = 1 + B + T$. Tais relações são consequência necessária e suficiente de quatro hipóteses
+estruturais confirmadas nos dados: (i) conectividade sem ciclos (árvore orientada enraizada);
+(ii) existência de um único ponto de entrada com $(\deg^-, \deg^+) = (0, 1)$; (iii) ramificação
+estritamente binária em todos os pontos internos não raiz $(\deg^-, \deg^+) = (1, 2)$; e (iv)
+terminais com $(\deg^-, \deg^+) = (1, 0)$. Caso houvesse qualquer trifurcação ou anel (anastomose),
+essas fórmulas deixariam de valer.
+
+\textbf{Q4. O que se pode inferir, e o que não se pode inferir, da recorrência obtida entre modelos
+de diferentes tamanhos?}\\
+\emph{Pode-se inferir} com exatidão matemática o crescimento assintótico e exato das contagens
+combinatórias globais ($|E| = 32\cdot 2^k - 1$, $B = 16\cdot 2^k - 1$, $|V| = 32\cdot 2^k$) para
+qualquer modelo CCO binário gerado com $N_{\mathrm{term}} = 16 \cdot 2^k$, bem como estimar custos
+de memória e processamento ($O(T)$ para representações esparsas versus $O(T^2)$ para matrizes densas).
+\emph{Não se pode inferir} que os segmentos de um modelo com $N_{\mathrm{term}}$ estejam contidos
+geometricamente no modelo com $2 N_{\mathrm{term}}$, nem que os raios/comprimentos escalem pela mesma
+recorrência linear, nem que $k$ represente estágios temporais ou níveis fisiológicos de ramificação
+de uma única árvore viva.
+
+\textbf{Q5. Em que sentido os agrupamentos modulares são úteis computacionalmente e por que seria
+indevido atribuir-lhes significado fisiológico automático?}\\
+Computacionalmente, congruências ($i \bmod 7$ ou TCR $i \equiv 17 \pmod{20}$) produzem partições e
+subamostras determinísticas, balanceadas (diferença $\le 1$ elemento entre classes), reprodutíveis
+entre plataformas e computáveis em $O(1)$ por segmento -- ideais para testes de regressão,
+distribuição de carga (\emph{sharding}) e auditoria de dados. Atribuir-lhes significado fisiológico
+seria um erro metodológico porque o índice $i$ reflete meramente a ordem de escrita das linhas no
+arquivo VTK; uma permutação arbitrária das entradas de \texttt{LINES} (e da correspondente lista de
+\texttt{raio}) preservaria integralmente a rede vascular física e sua hemodinâmica, mas reescreveria
+completamente todas as classes $C_j$ e a seleção TCR.
+
+% ============================================================================
+% 8. MODULO E -- INTEGRACAO, TESTES E REPRODUTIBILIDADE
+% ============================================================================
+\section{Módulo E -- Integração, Testes e Reprodutibilidade}
+
+\subsection{Interface de Linha de Comando e Resumo Matemático}
+
+Todos os módulos foram integrados no executável \texttt{cco\_explorer} (C++20), sem dependência de
+caminhos absolutos locais. A execução aceita parâmetros de diretório de entrada (\texttt{--entrada}),
+modelo individual (\texttt{--modelo}), trilha eletiva (\texttt{--trilha crt}), modo lote
+(\texttt{--todos}) e diretório de exportação (\texttt{--saida}). A listagem abaixo reproduz a saída
+calculada para \texttt{tree3D\_Nterm016.vtk}:
+
+\begin{lstlisting}
+CCO EXPLORER -- RESUMO MATEMATICO
+Arquivo: tree3D_Nterm016.vtk
+Pontos (V):                 32
+Segmentos (E):              31
+Terminais (T):              16
+Bifurcacoes (B):            15
+Ponto de entrada:           0
+Matriz da relacao:          32 x 32 (matriz densa gerada; 31 entradas iguais a 1; |R+|=179)
+Comprimentos 3D:            min=0.001239, medio=0.012246, max=0.025745, soma=0.379618 (unidades originais VTK)
+Raios por segmento:         min=0.226124, medio=0.369303, max=0.687011 (unidades originais VTK)
+Relacao pai-filho:          31 pares ordenados (|dom(R)|=16, |im(R)|=31; funcao p: V\{0}->V=SIM)
+Recorrencia entre modelos:  e_k = 2*e_{k-1} + 1 (e_0=31) => e_k = 32*2^k - 1; b_k = 16*2^k - 1; v_k = 32*2^k [validacao nos 6 modelos: OK]
+Consulta modular (mod 7):   frequencias=[C0:5, C1:5, C2:5, C3:4, C4:4, C5:4, C6:4]; soma=31; PCP max>=ceil(|E|/7)=5 (obs=5)
+Trilha B1 (TCR):            i===1 (mod 4) e i===2 (mod 5) <=> i===17 (mod 20); selecionados=1, comp_medio=0.009222, raio_medio=0.347816 (coincidencia=OK)
+Validacao:                  OK (confere com Tabela 1: SIM)
+\end{lstlisting}
+
+\subsection{Testes Mínimos de Aceitação (T1--T7) e Verificação Cruzada}
+
+A suíte automatizada \texttt{tests/test\_cco\_explorer.cpp} (executada via \texttt{CTest}) valida
+os sete requisitos mínimos de aceitação além de testes unitários de parser malformado, Euclides
+Estendido, TCR com módulos não coprimos, medianas pares/ímpares, algoritmo de Warshall independente
+e propriedades D3--D6. Adicionalmente, o script auxiliar \texttt{scripts/verificar\_resultados.py}
+reprocessa independentemente os seis VTK em Python puro e audita todos os arquivos CSV gerados pelo
+executável C++. A Tabela~\ref{tab:testes} sintetiza os resultados.
+
+\begin{table}[H]
+  \centering
+  \caption{Verificação dos testes mínimos de aceitação (Seção 10.1 do enunciado).}
+  \label{tab:testes}
+  \footnotesize
+  \begin{tabular}{cl>{\raggedright\arraybackslash}p{9.2cm}c}
+    \toprule
+    Teste & Módulo & Critério verificado automaticamente & Status \\
+    \midrule
+    \textbf{T1} & A   & Todos os seis VTK processados sem alterações manuais e com \texttt{validation.ok}. & PASS \\
+    \textbf{T2} & A   & $|V|, |E|, T, B$ e entrada única $0$ conferem integralmente com a Tabela 1. & PASS \\
+    \textbf{T3} & D   & Matriz pai--filho de \texttt{Nterm016} tem dimensão $32\times 32$ e exatamente $31$ entradas $1$. & PASS \\
+    \textbf{T4} & D   & $\mathcal{R}^+$ gera $148$ pares indiretos (ex.: $(0,12)$), coincide com Warshall e $\preceq$ é ordem parcial não total. & PASS \\
+    \textbf{T5} & C   & Inclusão--Exclusão fecha exatamente em \texttt{Nterm128}: $128 + 128 - 42 = 214$. & PASS \\
+    \textbf{T6} & C   & Recorrências deduzidas reproduzem exatamente $|E|, B, |V|$ nos $6$ modelos. & PASS \\
+    \textbf{T7} & B/D & Soma das $7$ frequências B0 é $255$ (PCP $\ge 37$); Trilha 1 TCR coincide nos dois métodos ($12$ em \texttt{Nterm128}, $51$ em \texttt{Nterm512}). & PASS \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\textbf{Reprodutibilidade e limitações:} o ambiente de desenvolvimento é fixado declarativamente por
+\texttt{devenv.nix} e \texttt{devenv.yaml} (CMake, Clang/GCC, \texttt{clang-format}, \texttt{clang-tidy},
+Python 3 e TeX Live), permitindo reconstruir o binário, rodar os testes e regenerar todos os arquivos
+CSV, figuras TikZ e este PDF com comandos padronizados documentados no \texttt{README.md}. Como
+limitações principais, destacam-se a ausência de metadados de unidades físicas nos VTK originais, o
+caráter estático da comparação entre modelos distintos e a escolha deliberada de não construir
+matrizes densas $O(|V|^2)$ para os modelos com $|V| \ge 64$.
+
+% ============================================================================
+% 9. CONCLUSAO, REFERENCIAS E CONTRIBUICOES
+% ============================================================================
+\section{Conclusão, Referências e Registro de Contribuições}
+
+O desenvolvimento do \textbf{CCO Explorer} demonstrou que conceitos fundamentais de Matemática
+Discreta -- aritmética modular, Teorema Chinês do Resto, dupla contagem, Inclusão--Exclusão,
+relações de recorrência, fechos transitivos, ordens parciais e relações de equivalência -- constituem
+ferramentas rigorosas e suficientes para validar, consultar e interpretar redes vasculares
+tridimensionais reais sem recorrer a estruturas avançadas de dados. Todos os módulos obrigatórios
+(A--E), a trilha eletiva escolhida (Trilha 1 -- TCR), os sete testes mínimos de aceitação (T1--T7) e
+a auditoria cruzada independente em Python foram integralmente cumpridos com 100\% de conformidade.
+
+\subsection*{Ferramentas, Bibliotecas e Honestidade Acadêmica}
+Em conformidade com a Seção 13 do enunciado, declara-se que a implementação central utilizou apenas a
+biblioteca padrão do C++20 (sem bibliotecas externas de parsing VTK ou grafos), gerenciada por CMake
+e \texttt{devenv} (incluindo \texttt{clang-format} e \texttt{clang-tidy} com zero alertas). Os scripts
+auxiliares em Python 3 empregam apenas a biblioteca padrão (\texttt{csv}, \texttt{math},
+\texttt{statistics}, \texttt{pathlib}, \texttt{zipfile}), e o relatório foi composto em \LaTeX{} com
+figuras vetoriais TikZ geradas diretamente dos CSVs. Eventual apoio de ferramentas de inteligência
+artificial durante o desenvolvimento deve ser devidamente revisado e compreendido por todos os
+integrantes do grupo, em consonância com as diretrizes docentes da disciplina.
+
+\subsection*{Registro de Contribuições dos Integrantes}
+\begin{table}[H]
+  \centering
+  \footnotesize
+  \begin{tabular}{p{3.8cm}p{2.2cm}p{8.5cm}}
+    \toprule
+    Integrante & Matrícula & Contribuições (análise matemática, programação e redação) \\
+    \midrule
+    \textit{Integrante 1} & \textit{00.0.0000} & Modelagem e parser VTK (Módulo A), análise combinatória e recorrências (Módulo C), testes automatizados e redação. \\
+    \textit{Integrante 2} & \textit{00.0.0000} & Teoria dos Números (Módulo B0 e Trilha 1 TCR), verificação cruzada em Python e revisão das demonstrações. \\
+    \textit{Integrante 3} & \textit{00.0.0000} & Relações, matriz $32\times 32$, fecho transitivo e ordem parcial (Módulo D), integração CLI (Módulo E) e diagramação \LaTeX. \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+{\small
+\begin{thebibliography}{9}
+  \setlength{\itemsep}{2pt}
+  \bibitem{rosen2019}
+  ROSEN, K. H. \textit{Discrete Mathematics and Its Applications}. 8th ed. New York: McGraw-Hill, 2019.
+
+  \bibitem{scheinerman2011}
+  SCHEINERMAN, E. R. \textit{Matemática Discreta: Uma Introdução}. 2. ed. São Paulo: Cengage Learning, 2011.
+
+  \bibitem{karch1999cco}
+  KARCH, R.; NEUMANN, F.; NEUMANN, M.; SCHREINER, W. A three-dimensional model for arterial tree
+  representation, generated by constrained constructive optimization. \textit{Computers in Biology
+  and Medicine}, v. 29, n. 1, p. 19--38, 1999.
+
+  \bibitem{vtkformat}
+  SCHROEDER, W.; MARTIN, K.; LORENSEN, B. \textit{The Visualization Toolkit: An Object-Oriented
+  Approach to 3D Graphics} (VTK File Formats, Legacy ASCII POLYDATA). 4th ed. Kitware, 2006.
+\end{thebibliography}
+}
+
+\end{document}

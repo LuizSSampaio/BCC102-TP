@@ -1,0 +1,47 @@
+====================================================================
+MODULO C -- CONTAGEM E RELACOES DE RECORRENCIA
+====================================================================
+
+1. PARTE C1 -- TECNICAS DE CONTAGEM
+Arquivo               T     B     |V|   |E|   C(T,2)      B * T       
+----------------------------------------------------------------------
+tree3D_Nterm016.vtk   16    15    32    31    120         240         
+tree3D_Nterm032.vtk   32    31    64    63    496         992         
+tree3D_Nterm064.vtk   64    63    128   127   2016        4032        
+tree3D_Nterm128.vtk   128   127   256   255   8128        16256       
+tree3D_Nterm256.vtk   256   255   512   511   32640       65280       
+tree3D_Nterm512.vtk   512   511   1024  1023  130816      261632      
+
+Relacoes estruturais verificadas em todos os modelos:
+  B = T - 1, |E| = 2T - 1, |V| = 2T, |V| = |E| + 1, |V| = 1 + B + T
+  Dupla contagem de graus: soma(out_degree) = 1 + 2B = |E| e soma(in_degree) = B + T = |E|
+
+Inclusao-Exclusao 3D em tree3D_Nterm128.vtk (C1.4):
+  r_med (mediana dos raios):        0.28469290
+  l_med (mediana dos comprimentos): 0.00530984
+  |A| = |{i : r_i >= r_med}| =      128
+  |B| = |{i : l_i >= l_med}| =      128
+  |A \cap B| =                      42
+  |A \cup B| =                      214
+  |A| + |B| - |A \cap B| =          214
+  Identidade |A U B| = |A| + |B| - |A n B| fechada: SIM
+  Complementares: |A\B|=86, |B\A|=86, |(A U B)^c|=41
+
+2. PARTE C2 -- RECORRENCIAS E VALIDACAO
+Recorrencia principal (segmentos): e_0 = 31, e_k = 2*e_{k-1} + 1 (k >= 1)
+  Solucao por iteracao:            e_k = 2^k * e_0 + (2^k - 1) = 32 * 2^k - 1
+  Solucao por equacao caract.:     e_k = 32 * 2^k - 1 = 2^{k+5} - 1
+Segundas relacoes (C2.4):
+  Bifurcacoes: b_0 = 15, b_k = 2*b_{k-1} + 1 => b_k = 16 * 2^k - 1 = T_k - 1
+  Pontos:      v_0 = 32, v_k = 2*v_{k-1}     => v_k = 32 * 2^k     = 2 * T_k
+
+k   Nterm   |V|     e_k     B       T       32*2^k-1  Confere   
+----------------------------------------------------------------
+0   16      32      31      15      16      31        SIM       
+1   32      64      63      31      32      63        SIM       
+2   64      128     127     63      64      127       SIM       
+3   128     256     255     127     128     255       SIM       
+4   256     512     511     255     256     511       SIM       
+5   512     1024    1023    511     512     1023      SIM       
+
+Validacao global das recorrencias nos 6 modelos: SIM

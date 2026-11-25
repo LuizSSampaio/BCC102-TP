@@ -1,0 +1,2 @@
+arquivo,total_segmentos,r_med,l_med,card_A,card_B,card_A_inter_B,card_A_union_B,card_A_menos_B,card_B_menos_A,card_nenhum,identidade_valida
+tree3D_Nterm128.vtk,255,0.28469290,0.00530984,128,128,42,214,86,86,41,SIM

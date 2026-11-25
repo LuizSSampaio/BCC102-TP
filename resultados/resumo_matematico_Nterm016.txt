@@ -1,0 +1,15 @@
+CCO EXPLORER -- RESUMO MATEMATICO
+Arquivo: tree3D_Nterm016.vtk
+Pontos (V):                 32
+Segmentos (E):              31
+Terminais (T):              16
+Bifurcacoes (B):            15
+Ponto de entrada:           0
+Matriz da relacao:          32 x 32 (matriz densa gerada; 31 entradas iguais a 1; |R+|=179)
+Comprimentos 3D:            min=0.001239, medio=0.012246, max=0.025745, soma=0.379618 (unidades originais VTK)
+Raios por segmento:         min=0.226124, medio=0.369303, max=0.687011 (unidades originais VTK)
+Relacao pai-filho:          31 pares ordenados (|dom(R)|=16, |im(R)|=31; funcao p: V\{0}->V=SIM)
+Recorrencia entre modelos:  e_k = 2*e_{k-1} + 1 (e_0=31) => e_k = 32*2^k - 1; b_k = 16*2^k - 1; v_k = 32*2^k [validacao nos 6 modelos: OK]
+Consulta modular (mod 7):   frequencias=[C0:5, C1:5, C2:5, C3:4, C4:4, C5:4, C6:4]; soma=31; PCP max>=ceil(|E|/7)=5 (obs=5)
+Trilha B1 (TCR):            i===1 (mod 4) e i===2 (mod 5) <=> i===17 (mod 20); selecionados=1, comp_medio=0.009222, raio_medio=0.347816 (coincidencia=OK)
+Validacao:                  OK (confere com Tabela 1: SIM)

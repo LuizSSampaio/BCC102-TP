@@ -1,0 +1,31 @@
+# Devenv
+.devenv*
+devenv.local.nix
+devenv.local.yaml
+devenv.lock
+
+# direnv
+.direnv
+
+# pre-commit
+.pre-commit-config.yaml
+
+# Build & CMake
+build/
+compile_commands.json
+
+# Python
+__pycache__/
+*.py[cod]
+
+# LaTeX intermediates
+relatorio/*.aux
+relatorio/*.log
+relatorio/*.out
+relatorio/*.toc
+relatorio/*.fls
+relatorio/*.fdb_latexmk
+relatorio/*.synctex.gz
+
+# Delivery archives
+*.zip
