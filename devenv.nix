@@ -17,7 +17,15 @@
 
   languages.python.enable = true;
 
-  languages.texlive.enable = true;
+  languages.texlive = {
+    enable = true;
+    packages = [
+      "tcolorbox"
+      "tikzfill"
+      "pdfcol"
+      "enumitem"
+    ];
+  };
 
   # Set compiler environment variables to Clang
   env.CXX = "clang++";

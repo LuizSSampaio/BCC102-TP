@@ -59,11 +59,11 @@ def generate_recurrence_figure(res_dir: Path, out_path: Path) -> None:
     lines.append(f"  \\node[font=\\footnotesize, rotate=90, anchor=south] at (-0.65,{height/2:.2f}) "
                  r"{Contagem de elementos (escala $\log_2$)};")
 
-    # Series: |V|, |E| (= e_k), B
+    # Series: |V|, |E| (= e_k), B (paleta institucional UFOP)
     series_spec = [
-        ("V_obs", "teal!75!black", "solid", r"$|V| = v_k = 32\cdot 2^k$", "above", 0.14),
-        ("E_obs", "blue!75!black", "dashed", r"$|E| = e_k = 32\cdot 2^k - 1$", "below right", -0.05),
-        ("B_obs", "orange!85!black", "solid", r"$B = b_k = 16\cdot 2^k - 1$", "below", -0.14),
+        ("V_obs", "deepnavy", "solid", r"$|V| = v_k = 32\cdot 2^k$", "above", 0.14),
+        ("E_obs", "ufopred", "dashed", r"$|E| = e_k = 32\cdot 2^k - 1$", "below right", -0.05),
+        ("B_obs", "orange!80!black", "solid", r"$B = b_k = 16\cdot 2^k - 1$", "below", -0.14),
     ]
 
     for col, color, style, _label, pos, dy in series_spec:
@@ -119,14 +119,14 @@ def generate_modular_b0_figure(res_dir: Path, out_path: Path) -> None:
         cnt = int(r["cardinalidade_Cj"])
         x0 = 0.35 + j * 0.80
         h = cnt * scale_y
-        fill_col = "teal!65!white" if cnt == 37 else "teal!35!white"
-        lines.append(f"    \\fill[{fill_col}, draw=teal!80!black] ({x0:.2f},0) rectangle ({x0+0.55:.2f},{h:.3f});")
+        fill_col = "deepnavy!75!white" if cnt == 37 else "deepnavy!32!white"
+        lines.append(f"    \\fill[{fill_col}, draw=deepnavy] ({x0:.2f},0) rectangle ({x0+0.55:.2f},{h:.3f});")
         lines.append(f"    \\node[anchor=south, font=\\tiny] at ({x0+0.275:.2f},{h+0.03:.3f}) {{{cnt}}};")
         lines.append(f"    \\node[anchor=north, font=\\scriptsize] at ({x0+0.275:.2f},-0.05) {{$C_{j}$}};")
 
     pcp_y = 37 * scale_y
-    lines.append(f"    \\draw[red!75!black, dashed, thick] (0,{pcp_y:.3f}) -- (6.0,{pcp_y:.3f});")
-    lines.append(f"    \\node[red!75!black, anchor=south west, font=\\tiny] at (3.2,{pcp_y+0.12:.3f}) "
+    lines.append(f"    \\draw[ufopred, dashed, thick] (0,{pcp_y:.3f}) -- (6.0,{pcp_y:.3f});")
+    lines.append(f"    \\node[ufopred, anchor=south west, font=\\tiny] at (3.2,{pcp_y+0.12:.3f}) "
                  r"{PCP: $\lceil 255/7 \rceil = 37$};")
     lines.append(r"  \end{scope}")
 
@@ -157,13 +157,13 @@ def generate_modular_b0_figure(res_dir: Path, out_path: Path) -> None:
         rm = float(r["raio_medio"])
         x0 = 0.35 + j * 0.80
         h = sy_r(rm)
-        lines.append(f"    \\fill[blue!45!white, draw=blue!75!black] ({x0:.2f},0) rectangle ({x0+0.55:.2f},{h:.3f});")
-        lines.append(f"    \\node[anchor=south, font=\\tiny] at ({x0+0.275:.2f},{h+0.03:.3f}) {{{rm:.3f}}};")
+        lines.append(f"    \\fill[ufopred!50!white, draw=ufopred] ({x0:.2f},0) rectangle ({x0+0.55:.2f},{h:.3f});")
+        lines.append(f"    \\node[anchor=south, font=\\tiny, fill=white, fill opacity=0.85, text opacity=1, inner sep=0.6pt] at ({x0+0.275:.2f},{h+0.03:.3f}) {{{rm:.3f}}};")
         lines.append(f"    \\node[anchor=north, font=\\scriptsize] at ({x0+0.275:.2f},-0.05) {{$C_{j}$}};")
 
     gm_y = sy_r(global_mean_r)
-    lines.append(f"    \\draw[orange!85!black, dashed, thick] (0,{gm_y:.3f}) -- (6.0,{gm_y:.3f});")
-    lines.append(f"    \\node[orange!85!black, fill=white, fill opacity=0.9, text opacity=1, "
+    lines.append(f"    \\draw[deepnavy, dashed, thick] (0,{gm_y:.3f}) -- (6.0,{gm_y:.3f});")
+    lines.append(f"    \\node[deepnavy, fill=white, fill opacity=0.9, text opacity=1, "
                  f"inner sep=1.5pt, anchor=north east, font=\\tiny] at (5.95,3.88) "
                  f"{{Linha tracejada: média global = {global_mean_r:.4f}}};")
     lines.append(r"  \end{scope}")
@@ -197,9 +197,9 @@ def generate_inclusion_exclusion_figure(res_dir: Path, out_path: Path) -> None:
     lines = [
         "% Figura gerada automaticamente por scripts/gerar_figuras_tikz.py",
         r"\begin{tikzpicture}[font=\footnotesize]",
-        # Subtle quadrant shading
-        f"  \\fill[teal!8] ({xr_med:.3f},{yl_med:.3f}) rectangle ({width:.2f},{height:.2f});",
-        f"  \\fill[blue!6] ({xr_med:.3f},0) rectangle ({width:.2f},{yl_med:.3f});",
+        # Subtle quadrant shading (paleta institucional UFOP)
+        f"  \\fill[ufopred!8] ({xr_med:.3f},{yl_med:.3f}) rectangle ({width:.2f},{height:.2f});",
+        f"  \\fill[deepnavy!7] ({xr_med:.3f},0) rectangle ({width:.2f},{yl_med:.3f});",
         f"  \\fill[orange!7] (0,{yl_med:.3f}) rectangle ({xr_med:.3f},{height:.2f});",
         f"  \\fill[gray!6] (0,0) rectangle ({xr_med:.3f},{yl_med:.3f});",
         f"  \\draw[gray!50] (0,0) rectangle ({width:.2f},{height:.2f});",
@@ -216,11 +216,11 @@ def generate_inclusion_exclusion_figure(res_dir: Path, out_path: Path) -> None:
         lines.append(f"  \\node[anchor=east, font=\\scriptsize] at (-0.08,{yy:.3f}) {{{lt:.3f}}};")
 
     # Median lines
-    lines.append(f"  \\draw[red!75!black, dashed, thick] ({xr_med:.3f},0) -- ({xr_med:.3f},{height:.2f});")
-    lines.append(f"  \\draw[red!75!black, dashed, thick] (0,{yl_med:.3f}) -- ({width:.2f},{yl_med:.3f});")
-    lines.append(f"  \\node[red!75!black, anchor=south, font=\\scriptsize] at ({xr_med:.3f},{height+0.06:.3f}) "
+    lines.append(f"  \\draw[darkslate, dashed, thick] ({xr_med:.3f},0) -- ({xr_med:.3f},{height:.2f});")
+    lines.append(f"  \\draw[darkslate, dashed, thick] (0,{yl_med:.3f}) -- ({width:.2f},{yl_med:.3f});")
+    lines.append(f"  \\node[darkslate, anchor=south, font=\\scriptsize] at ({xr_med:.3f},{height+0.06:.3f}) "
                  f"{{$r_{{\\mathrm{{med}}}} = {r_med:.4f}$}};")
-    lines.append(f"  \\node[red!75!black, fill=white, fill opacity=0.88, text opacity=1, inner sep=1.5pt, "
+    lines.append(f"  \\node[darkslate, fill=white, fill opacity=0.88, text opacity=1, inner sep=1.5pt, "
                  f"anchor=south east, font=\\scriptsize] at ({width-0.12:.3f},{yl_med+0.08:.3f}) "
                  f"{{$\\ell_{{\\mathrm{{med}}}} = {l_med:.5f}$}};")
 
@@ -231,26 +231,26 @@ def generate_inclusion_exclusion_figure(res_dir: Path, out_path: Path) -> None:
         in_a = r >= r_med
         in_b = l >= l_med
         if in_a and in_b:
-            col = "teal!80!black"
+            col = "ufopred"
         elif in_a and not in_b:
-            col = "blue!70!black"
+            col = "deepnavy"
         elif not in_a and in_b:
-            col = "orange!85!black"
+            col = "orange!80!black"
         else:
-            col = "gray!70!black"
+            col = "darkslate!55"
         lines.append(f"  \\fill[{col}] ({sx(r):.3f},{sy(l):.3f}) circle (1.35pt);")
 
     # Quadrant summary badges
-    lines.append(f"  \\node[fill=white, fill opacity=0.88, text opacity=1, draw=teal!70!black, rounded corners=2pt, "
+    lines.append(f"  \\node[fill=white, fill opacity=0.88, text opacity=1, draw=ufopred, rounded corners=2pt, "
                  f"font=\\scriptsize, anchor=north east] at ({width-0.18:.2f},{height-0.18:.2f}) "
                  f"{{$A \\cap B$: {ie['card_A_inter_B']} seg.}};")
-    lines.append(f"  \\node[fill=white, fill opacity=0.88, text opacity=1, draw=blue!70!black, rounded corners=2pt, "
+    lines.append(f"  \\node[fill=white, fill opacity=0.88, text opacity=1, draw=deepnavy, rounded corners=2pt, "
                  f"font=\\scriptsize, anchor=south east] at ({width-0.18:.2f},0.18) "
                  f"{{$A \\setminus B$: {ie['card_A_menos_B']} seg.}};")
     lines.append(f"  \\node[fill=white, fill opacity=0.88, text opacity=1, draw=orange!80!black, rounded corners=2pt, "
                  f"font=\\scriptsize, anchor=north west] at (0.14,{height-0.18:.2f}) "
                  f"{{$B \\setminus A$: {ie['card_B_menos_A']} seg.}};")
-    lines.append(f"  \\node[fill=white, fill opacity=0.88, text opacity=1, draw=gray!70!black, rounded corners=2pt, "
+    lines.append(f"  \\node[fill=white, fill opacity=0.88, text opacity=1, draw=darkslate!65, rounded corners=2pt, "
                  f"font=\\scriptsize, anchor=south west] at (0.14,0.18) "
                  f"{{$(A \\cup B)^c$: {ie['card_nenhum']} seg.}};")
 
@@ -291,7 +291,7 @@ def generate_matrices_d_figure(res_dir: Path, out_path: Path) -> None:
             if mat_r[u][v] == 1:
                 x = v * cell
                 y = (n - 1 - u) * cell
-                lines.append(f"    \\fill[teal!80!black] ({x:.3f},{y:.3f}) rectangle ({x+cell:.3f},{y+cell:.3f});")
+                lines.append(f"    \\fill[deepnavy] ({x:.3f},{y:.3f}) rectangle ({x+cell:.3f},{y+cell:.3f});")
     lines.append(f"    \\draw[gray!70] (0,0) rectangle ({size:.3f},{size:.3f});")
     for t in (0, 8, 16, 24, 31):
         xt = (t + 0.5) * cell
@@ -304,7 +304,7 @@ def generate_matrices_d_figure(res_dir: Path, out_path: Path) -> None:
     lines.append(f"    \\node[font=\\scriptsize, rotate=90, anchor=south] at (-0.48,{size/2:.3f}) {{Linha $u$ (pai)}};")
     lines.append(r"  \end{scope}")
 
-    # Right panel: Matrix of R^+ (direct in teal, indirect in orange)
+    # Right panel: Matrix of R^+ (direct in deepnavy, indirect in ufopred)
     lines.append(r"  \begin{scope}[xshift=7.1cm]")
     lines.append(f"    \\fill[gray!6] (0,0) rectangle ({size:.3f},{size:.3f});")
     for k in range(0, n + 1, 4):
@@ -316,7 +316,7 @@ def generate_matrices_d_figure(res_dir: Path, out_path: Path) -> None:
             if mat_rp[u][v] == 1:
                 x = v * cell
                 y = (n - 1 - u) * cell
-                col = "teal!80!black" if mat_r[u][v] == 1 else "orange!85!black"
+                col = "deepnavy" if mat_r[u][v] == 1 else "ufopred!80!white"
                 lines.append(f"    \\fill[{col}] ({x:.3f},{y:.3f}) rectangle ({x+cell:.3f},{y+cell:.3f});")
     lines.append(f"    \\draw[gray!70] (0,0) rectangle ({size:.3f},{size:.3f});")
     for t in (0, 8, 16, 24, 31):
@@ -331,10 +331,10 @@ def generate_matrices_d_figure(res_dir: Path, out_path: Path) -> None:
     lines.append(r"  \end{scope}")
 
     # Shared compact legend below (well separated)
-    lines.append(r"  \fill[teal!80!black] (0.9,-1.05) rectangle (1.25,-0.80);")
-    lines.append(r"  \node[anchor=west, font=\scriptsize] at (1.35,-0.92) {Relação direta $(u,v)\in \mathcal{R}$ (31 pares)};")
-    lines.append(r"  \fill[orange!85!black] (6.9,-1.05) rectangle (7.25,-0.80);")
-    lines.append(r"  \node[anchor=west, font=\scriptsize] at (7.35,-0.92) {Ancestralidade indireta $\mathcal{R}^+\setminus \mathcal{R}$ (148 pares)};")
+    lines.append(r"  \fill[deepnavy] (0.9,-1.32) rectangle (1.25,-1.07);")
+    lines.append(r"  \node[anchor=west, font=\scriptsize] at (1.35,-1.195) {Relação direta $(u,v)\in \mathcal{R}$ (31 pares)};")
+    lines.append(r"  \fill[ufopred!80!white] (6.9,-1.32) rectangle (7.25,-1.07);")
+    lines.append(r"  \node[anchor=west, font=\scriptsize] at (7.35,-1.195) {Ancestralidade indireta $\mathcal{R}^+\setminus \mathcal{R}$ (148 pares)};")
 
     lines.append(r"\end{tikzpicture}")
     out_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
